@@ -93,6 +93,8 @@ public:
         {
             echo_server es{log};
             stream<test::stream> ws{ioc_};
+
+            // We have an inactivity timeout of 2s, but don't send pings
             ws.set_option(stream_base::timeout{
                 stream_base::none(),
                 std::chrono::seconds(2),
@@ -110,11 +112,23 @@ public:
                             system_error{ec});
                     got_timeout = true;
                 });
-            test::run_for(ioc_, std::chrono::seconds(1));
+            // We are connected, base state
+
+            test::run_for(ioc_, std::chrono::milliseconds(1250));
+            // After 1.25s idle, no timeout (but idle counter is 1)
+
             es.async_ping();
-            test::run_for(ioc_, std::chrono::seconds(1));
+            test::run_for(ioc_, std::chrono::milliseconds(500));
+            // The server sent data at 1.25s mark, and we're now at 1.75s mark.
+            // We haven't hit the idle timer yet (happens at 1s, 2s, 3s)
+
+            test::run_for(ioc_, std::chrono::milliseconds(750));
+            // At 2.5s total; should have triggered the idle timer (but no timeout)
             BEAST_EXPECT(!got_timeout);
-            test::run_for(ioc_, std::chrono::seconds(2));
+
+            test::run_for(ioc_, std::chrono::milliseconds(750));
+            // At 3s total; should have triggered the idle timer again without
+            // activity and triggered timeout.
             BEAST_EXPECT(got_timeout);
         }
 
@@ -139,7 +153,7 @@ public:
             ws.async_read(b, test::fail_handler(asio::error::operation_aborted));
             // We are connected, base state
             test::run_for(ioc_, std::chrono::seconds(2));
-            // About a second later, we should have close to 5 pings/pongs, and no timeout
+            // About a second later, we should have close to 4 pings/pongs, and no timeout
             BEAST_EXPECTS(2 <= n_pongs && n_pongs <= 4, "Unexpected nr of pings: " + std::to_string(n_pongs));
         }
     }
