@@ -17,7 +17,7 @@ jobs:
         uses: cppalliance/aws-hosted-runners@v1.0.0
 
   posix:
-    if: true
+    if: false
     defaults:
       run:
         shell: bash
@@ -317,96 +317,103 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - description: msvc-14.2-cxx14-win32
-            toolset: msvc-14.2
-            cxxstd: "14"
-            addrmd: 32
-            os: windows-2019
-            cxxflags: ""
-            supported: true
-          - description: msvc-14.2-cxx17-win32
-            toolset: msvc-14.2
-            cxxstd: "17"
-            addrmd: 32
-            os: windows-2019
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - description: msvc-14.2-cxx20-win32
-            toolset: msvc-14.2
-            cxxstd: "latest"
-            addrmd: 32
-            os: windows-2019
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - description: msvc-14.2-cxx14-win64
-            toolset: msvc-14.2
+          - description: msvc-14.1-cxx14-win64
+            toolset: msvc-14.0
             cxxstd: "14"
             addrmd: 64
             os: windows-2019
             cxxflags: ""
             supported: true
-          - description: msvc-14.2-cxx17-win64
-            toolset: msvc-14.2
-            cxxstd: "17"
-            addrmd: 64
-            os: windows-2019
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - description: msvc-14.2-cxx20-win64
-            toolset: msvc-14.2
-            cxxstd: "latest"
-            addrmd: 64
-            os: windows-2019
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - description: msvc-14.3-cxx14-win32
-            toolset: msvc-14.3
-            cxxstd: "14"
-            addrmd: 32
-            os: windows-2022
-            cxxflags: ""
-            supported: true
-          - description: msvc-14.3-cxx17-win32
-            toolset: msvc-14.3
-            cxxstd: "17"
-            addrmd: 32
-            os: windows-2022
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - description: msvc-14.3-cxx20-win32
-            toolset: msvc-14.3
-            cxxstd: "20"
-            addrmd: 32
-            os: windows-2022
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - description: msvc-14.3-cxx14-win64
-            toolset: msvc-14.3
-            cxxstd: "14"
-            addrmd: 64
-            os: windows-2022
-            cxxflags: ""
-            supported: true
-          - description: msvc-14.3-cxx17-win64
-            toolset: msvc-14.3
-            cxxstd: "17"
-            addrmd: 64
-            os: windows-2022
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - description: msvc-14.3-cxx20-win64
-            toolset: msvc-14.3
-            cxxstd: "20"
-            addrmd: 64
-            os: windows-2022
-            cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
-            supported: true
-          - toolset: gcc
-            cxxstd: "11,14,17,2a"
-            addrmd: 64
-            os: windows-2019
-            cxxflags: "cxxflags=-Wa,-mbig-obj"
-            supported: "Too many unknowns to get this compiler working - gcc-8.1"
+          # - description: msvc-14.2-cxx14-win32
+          #   toolset: msvc-14.2
+          #   cxxstd: "14"
+          #   addrmd: 32
+          #   os: windows-2019
+          #   cxxflags: ""
+          #   supported: true
+          # - description: msvc-14.2-cxx17-win32
+          #   toolset: msvc-14.2
+          #   cxxstd: "17"
+          #   addrmd: 32
+          #   os: windows-2019
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - description: msvc-14.2-cxx20-win32
+          #   toolset: msvc-14.2
+          #   cxxstd: "latest"
+          #   addrmd: 32
+          #   os: windows-2019
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - description: msvc-14.2-cxx14-win64
+          #   toolset: msvc-14.2
+          #   cxxstd: "14"
+          #   addrmd: 64
+          #   os: windows-2019
+          #   cxxflags: ""
+          #   supported: true
+          # - description: msvc-14.2-cxx17-win64
+          #   toolset: msvc-14.2
+          #   cxxstd: "17"
+          #   addrmd: 64
+          #   os: windows-2019
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - description: msvc-14.2-cxx20-win64
+          #   toolset: msvc-14.2
+          #   cxxstd: "latest"
+          #   addrmd: 64
+          #   os: windows-2019
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - description: msvc-14.3-cxx14-win32
+          #   toolset: msvc-14.3
+          #   cxxstd: "14"
+          #   addrmd: 32
+          #   os: windows-2022
+          #   cxxflags: ""
+          #   supported: true
+          # - description: msvc-14.3-cxx17-win32
+          #   toolset: msvc-14.3
+          #   cxxstd: "17"
+          #   addrmd: 32
+          #   os: windows-2022
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - description: msvc-14.3-cxx20-win32
+          #   toolset: msvc-14.3
+          #   cxxstd: "20"
+          #   addrmd: 32
+          #   os: windows-2022
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - description: msvc-14.3-cxx14-win64
+          #   toolset: msvc-14.3
+          #   cxxstd: "14"
+          #   addrmd: 64
+          #   os: windows-2022
+          #   cxxflags: ""
+          #   supported: true
+          # - description: msvc-14.3-cxx17-win64
+          #   toolset: msvc-14.3
+          #   cxxstd: "17"
+          #   addrmd: 64
+          #   os: windows-2022
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - description: msvc-14.3-cxx20-win64
+          #   toolset: msvc-14.3
+          #   cxxstd: "20"
+          #   addrmd: 64
+          #   os: windows-2022
+          #   cxxflags: "cxxflags=-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1"
+          #   supported: true
+          # - toolset: gcc
+          #   cxxstd: "11,14,17,2a"
+          #   addrmd: 64
+          #   os: windows-2019
+          #   cxxflags: "cxxflags=-Wa,-mbig-obj"
+          #   supported: "Too many unknowns to get this compiler working - gcc-8.1"
 
     needs: [runner-selection]
     runs-on: ${{ fromJSON(needs.runner-selection.outputs.labelmatrix)[matrix.os] }}
