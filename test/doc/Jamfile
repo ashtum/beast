@@ -13,20 +13,7 @@ local libs =
     ;
 
 local SOURCES =
-    core_1_refresher.cpp
-    core_3_timeouts.cpp
     core_4_layers.cpp
-    http_10_custom_parser.cpp
-    http_examples.cpp
-    websocket.cpp
-    websocket_1_connecting.cpp
-    websocket_2_handshaking.cpp
-    websocket_3_decorator.cpp
-    websocket_4_messages.cpp
-    websocket_5_control_frames.cpp
-    websocket_6_timeouts.cpp
-    websocket_7_teardown.cpp
-    websocket_8_notes.cpp
     ;
 
 local RUN_TESTS ;

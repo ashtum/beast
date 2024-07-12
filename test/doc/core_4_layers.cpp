@@ -20,6 +20,120 @@
 
 namespace boost {
 namespace beast {
+template<
+    class Handler,
+    class Executor1,
+    class Allocator = std::allocator<void>
+>
+class async_base2
+#if ! BOOST_BEAST_DOXYGEN
+    : private boost::empty_value<Allocator>
+#endif
+{
+    static_assert(
+        net::is_executor<Executor1>::value || net::execution::is_executor<Executor1>::value,
+        "Executor type requirements not met");
+
+    Handler h_;
+    detail::select_work_guard_t<Executor1> wg1_;
+    net::cancellation_type act_{net::cancellation_type::terminal};
+public:
+    /** The type of executor associated with this object.
+
+    If a class derived from @ref boost::beast::async_base2 is a completion
+    handler, then the associated executor of the derived class will
+    be this type.
+*/
+    using executor_type =
+#if BOOST_BEAST_DOXYGEN
+        __implementation_defined__;
+#else
+        typename
+        net::associated_executor<
+            Handler,
+            typename detail::select_work_guard_t<Executor1>::executor_type
+                >::type;
+#endif
+
+    /** The type of the immediate executor associated with this object.
+
+    If a class derived from @ref boost::beast::async_base2 is a completion
+    handler, then the associated immediage executor of the derived class will
+    be this type.
+*/
+    using immediate_executor_type =
+#if BOOST_BEAST_DOXYGEN
+        __implementation_defined__;
+#else
+        typename
+        net::associated_immediate_executor<
+            Handler,
+            typename detail::select_work_guard_t<Executor1>::executor_type
+                >::type;
+#endif
+
+
+  private:
+
+    virtual
+    void
+    before_invoke_hook()
+    {
+    }
+
+public:
+    /** Constructor
+
+        @param handler The final completion handler.
+        The type of this object must meet the requirements of <em>CompletionHandler</em>.
+        The implementation takes ownership of the handler by performing a decay-copy.
+
+        @param ex1 The executor associated with the implied I/O object
+        target of the operation. The implementation shall maintain an
+        executor work guard for the lifetime of the operation, or until
+        the final completion handler is invoked, whichever is shorter.
+
+        @param alloc The allocator to be associated with objects
+        derived from this class. If `Allocator` is default-constructible,
+        this parameter is optional and may be omitted.
+    */
+#if BOOST_BEAST_DOXYGEN
+    template<class Handler_>
+    async_base2(
+        Handler&& handler,
+        Executor1 const& ex1,
+        Allocator const& alloc = Allocator());
+#else
+    template<
+        class Handler_,
+        class = typename std::enable_if<
+            ! std::is_same<typename
+                std::decay<Handler_>::type,
+                async_base2
+            >::value>::type
+    >
+    async_base2(
+        Handler_&& handler,
+        Executor1 const& ex1)
+        : h_(std::forward<Handler_>(handler))
+        , wg1_(detail::make_work_guard(ex1))
+    {
+    }
+
+    template<class Handler_>
+    async_base2(
+        Handler_&& handler,
+        Executor1 const& ex1,
+        Allocator const& alloc)
+        : boost::empty_value<Allocator>(
+            boost::empty_init_t{}, alloc)
+        , h_(std::forward<Handler_>(handler))
+        , wg1_(ex1)
+    {
+    }
+#endif
+};
+
 
 void
 core_4_layers_snippets()
@@ -87,18 +201,18 @@ class counted_stream
             using handler_type = typename std::decay<ReadHandler>::type;
 
             // async_base handles all of the composed operation boilerplate for us
-            using base = async_base<
+            using base_ = async_base<
                 handler_type, beast::executor_type<NextLayer>>;
 
             // Our composed operation is implemented as a completion handler object
-            struct op : base
+            struct op : base_
             {
                 counted_stream& stream_;
 
                 op( counted_stream& stream,
                     handler_type&& handler,
                     MutableBufferSequence const& buffers)
-                    : base(std::move(handler), stream.get_executor())
+                    : base_(std::move(handler), stream.get_executor())
                     , stream_(stream)
                 {
                     // Start the asynchronous operation
@@ -132,19 +246,30 @@ class counted_stream
         {
             using handler_type = typename std::decay<WriteHandler>::type;
 
-            // async_base handles all of the composed operation boilerplate for us
-            using base = async_base<
+            using base = async_base2<
                 handler_type, beast::executor_type<NextLayer>>;
+            struct S : base {
+                S(counted_stream& stream,
+                    handler_type&& handler) : base(std::move(handler), stream.get_executor()) {}
+            };
+
+            S(*stream, std::forward<WriteHandler>(handler));
+
+
+
+            // async_base handles all of the composed operation boilerplate for us
+            typedef async_base<
+                handler_type, beast::executor_type<NextLayer>> base2;
 
             // Our composed operation is implemented as a completion handler object
-            struct op : base
+            struct op : base2
             {
                 counted_stream& stream_;
 
                 op( counted_stream& stream,
                     handler_type&& handler,
                     ConstBufferSequence const& buffers)
-                    : base(std::move(handler), stream.get_executor())
+                    : base2(std::move(handler), stream.get_executor())
                     , stream_(stream)
                 {
                     // Start the asynchronous operation
