@@ -17,10 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang
+      - uses: Jimver/cuda-toolkit@v0.2.19
+        with:
+          linux-local-args: '["--toolkit"]'
 
       - name: Setup Boost
         run: |
@@ -41,25 +40,9 @@ jobs:
           cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
           git submodule update --init tools/boostdep
           python tools/boostdep/depinst/depinst.py --git_args "--jobs 3" $LIBRARY
-  
-      - name: Fuzz corpus
-        uses: actions/cache@v3.3.1
-        id: cache-corpus
-        with:
-          path: ${{ github.workspace }}/corpus.tar
-          key: corpus-${{ github.run_id }}
-          enableCrossOsArchive: true
-          restore-keys: |
-            corpus-
+          cd libs/$LIBRARY
+          mkdir build && cd build
+          cmake -DBUILD_TESTING=OFF -DCMAKE_CXX_COMPILER=nvcc -DCMAKE_C_COMPILER=nvcc -DCMAKE_CXX_LINK_FLAGS="-m64 -ccbin aarch64-linux-gnu-g++" -DCMAKE_C_LINK_EXECUTABLE="nvcc -m64 -ccbin aarch64-linux-gnu-g++" ..
+          make -j 4
 
-      - name: Run fuzzer
-        run: |
-          cd ../boost-root/libs/beast
-          mkdir __build__ && cd __build__
-          cmake \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -DCMAKE_C_COMPILER=clang \
-            -DBOOST_BEAST_BUILD_EXAMPLES=OFF \
-            -DBOOST_BEAST_BUILD_FUZZERS=ON \
-            -DBOOST_BEAST_FUZZER_CORPUS_PATH=${{ github.workspace }}/corpus.tar ..
-          make boost_beast_fuzz_all
+  
