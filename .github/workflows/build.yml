@@ -309,14 +309,14 @@ jobs:
           # `file too big` error even when using `-Wa,-mbig-obj` and
           # `debug-symbols=off`.
 
-          # - toolset: gcc
-          #   cxxstd: "11,14"
-          #   addrmd: 64
-          #   os: windows-2022
-          # - toolset: gcc
-          #   cxxstd: "17,2a"
-          #   addrmd: 64
-          #   os: windows-2022
+          - toolset: gcc
+            cxxstd: "11,14"
+            addrmd: 64
+            os: windows-2022
+          - toolset: gcc
+            cxxstd: "17,2a"
+            addrmd: 64
+            os: windows-2022
 
     needs: [runner-selection]
     runs-on: ${{ fromJSON(needs.runner-selection.outputs.labelmatrix)[matrix.os] }}

@@ -168,7 +168,7 @@ public:
             "0123456789"; // 40
         // create the temporary file
         {
-            std::ofstream fstemp(temp.path().string());
+            std::ofstream fstemp(temp.path().c_str());
             std::size_t written = 0;
             std::size_t to_write = 4097;
             while (written < to_write)
