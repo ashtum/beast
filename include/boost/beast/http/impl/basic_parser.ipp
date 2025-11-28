@@ -612,6 +612,11 @@ parse_chunk_header(char const*& in,
         return;
     if(! eol)
     {
+        if(n >= 4096)
+        {
+            BOOST_BEAST_ASSIGN_EC(ec, error::bad_chunk);
+            return;
+        }
         BOOST_BEAST_ASSIGN_EC(ec, error::need_more);
         return;
     }
